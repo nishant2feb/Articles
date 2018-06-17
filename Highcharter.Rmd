@@ -1,0 +1,53 @@
+---
+title: "Data Visualization with Highcharter in R"
+author: "Nishant"
+date: "June 17, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Visualization with Highcharter in R
+
+## Learn how to use Highcharter to create visualization that creates a buzz
+
+I think data visualization is the best technique to show any descriptive and analytics reporting on a chunk of data.
+I am a type of person who loves data visualization, you can show the whole story in single screen well that also depends on the data complexity. 
+If you are reading this tutorial then I think you must be aware of `Ggplot2` package in R which is used to generate some awesome charts for analysis but somehow lacks dynamic properties, well moving forward came `Plotly` which provided an extension to present dynamic charts, It can also be used as wrapper of ggplot2 object and making a dynamic chart using ggplotly function as shown in the example.
+
+```{r PlotlyExample, message=FALSE, warning=FALSE}
+
+
+
+```
+
+But Its a separate topic may be in future you can get a tutorial over it.
+
+
+Coming Back to Highcharter, So it is a `R` wrapper of **HighCharts** javascript library and its module.
+
+The main features of this packege is:
+
+* You can create various charts with same style like scatter, bubble, time series, heatmaps, treemaps, bar charts etc..
+* It supports various R objects.
+* It supports Highstocks Charts, Choloropleths.
+* It do have piping style which is loved by all R users and programmer.
+* A large variety of themes with awesome looks.
+
+Lets get down to the business and create some visulaization with Highcharter following the features mentioned above:
+
+## Creating some Basic Charts
+
+Lets choose a dataset, I am going to take Pokemon dataset also provided in Highcharter package.
+Have a glimpse of the datset.
+
+```{r, message=FALSE, warning=FALSE}
+
+glimpse(pokemon)
+
+```
+
+
+
