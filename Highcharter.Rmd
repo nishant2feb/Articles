@@ -9,6 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r message=FALSE, warning=FALSE}
+library(highcharter)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+data("pokemon")
+```
+
+
 # Data Visualization with Highcharter in R
 
 ## Learn how to use Highcharter to create visualization that creates a buzz
@@ -49,5 +58,43 @@ glimpse(pokemon)
 
 ```
 
+Lets plot a bar chart.
+
+```{r message=FALSE, warning=FALSE}
+
+pokemon%>%
+  count(type_1)%>%
+  arrange(n)%>%
+  hchart(type = "bar", hcaes(x = type_1, y = n))
+
+```
 
 
+So you got a bar chart with repect of of type 1 category of the pokemons.
+
+Suppose you want a column chart instead then the only variable that you need to change is the type to column.
+
+```{r message=FALSE, warning=FALSE}
+
+pokemon%>%
+  count(type_1)%>%
+  arrange(n)%>%
+  hchart(type = "column", hcaes(x = type_1, y = n))
+
+
+```
+
+Lets plot some other charts too.
+
+### Treemap
+```{r message=FALSE, warning=FALSE}
+
+pokemon%>%
+  count(type_1)%>%
+  arrange(n)%>%
+  hchart(type = "treemap", hcaes(x = type_1, value = n, color = n))
+
+
+```
+
+### 
