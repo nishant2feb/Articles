@@ -47,7 +47,13 @@ The main features of this packege is:
 
 Lets get down to the business and create some visulaization with Highcharter following the features mentioned above:
 
-## Creating some Basic Charts
+## Creating some Basic Charts Using hchart function
+
+hchart is a generic function which take an object and return an highcharter object. There are functions whose behaviour are similar with the functions of ggplot2 package like :
+
+* hchart works like ggplot2's `qplot`.
+* hc_add_series works like ggplot2's `geom_S`.
+* hcaes works like ggplot2's `aes`.
 
 Lets choose a dataset, I am going to take Pokemon dataset also provided in Highcharter package.
 Have a glimpse of the datset.
@@ -84,9 +90,8 @@ pokemon%>%
 
 ```
 
-Lets plot some other charts too.
-
 ### Treemap
+
 ```{r message=FALSE, warning=FALSE}
 
 pokemon%>%
@@ -97,4 +102,13 @@ pokemon%>%
 
 ```
 
-### 
+We can also use `hc_add_series` to plot the chart.
+
+```{r, message=FALSE, warning=FALSE}
+
+highchart()%>%
+  hc_add_series(pokemon, "scatter", hcaes(x = height, y = weight))
+
+```
+
+
