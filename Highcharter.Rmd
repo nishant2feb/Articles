@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r message=FALSE, warning=FALSE}
 library(highcharter)
 library(ggplot2)
-library(plotly)
 library(dplyr)
+library(broom)
 data("pokemon")
 ```
 
@@ -24,15 +24,7 @@ data("pokemon")
 
 I think data visualization is the best technique to show any descriptive and analytics reporting on a chunk of data.
 I am a type of person who loves data visualization, you can show the whole story in single screen well that also depends on the data complexity. 
-If you are reading this tutorial then I think you must be aware of `Ggplot2` package in R which is used to generate some awesome charts for analysis but somehow lacks dynamic properties, well moving forward came `Plotly` which provided an extension to present dynamic charts, It can also be used as wrapper of ggplot2 object and making a dynamic chart using ggplotly function as shown in the example.
-
-```{r PlotlyExample, message=FALSE, warning=FALSE}
-
-
-
-```
-
-But Its a separate topic may be in future you can get a tutorial over it.
+If you are reading this tutorial then I think you must be aware of `Ggplot2` package in R which is used to generate some awesome charts for analysis but somehow lacks dynamic properties.
 
 
 Coming Back to Highcharter, So it is a `R` wrapper of **HighCharts** javascript library and its module.
@@ -104,11 +96,51 @@ pokemon%>%
 
 We can also use `hc_add_series` to plot the chart.
 
+### Scatterplot
 ```{r, message=FALSE, warning=FALSE}
 
 highchart()%>%
   hc_add_series(pokemon, "scatter", hcaes(x = height, y = weight))
 
 ```
+
+The main difference in ggplot2's geom_ functions and hc_add_series is that we need to add data and aesthetics explicitly in every function while in ggplot2 one can add data and aesthetics in a layer and then can further add more geoms which can work on same data and aesthetics.
+
+```{r message=FALSE, warning=FALSE}
+
+highchart()%>%
+  hc_add_series(pokemon, "scatter", hcaes(x = height, y = weight))%>%
+  hc_add_series(pokemon, "line", hcaes(x = height, y = weight))
+  
+
+```
+
+
+A more accurate example is given below using diamond dataset in ggplot2 package.
+
+```{r message=FALSE, warning=FALSE}
+
+data(diamonds, package = "ggplot2")
+
+set.seed(123)
+data <- sample_n(diamonds, 300)
+
+modlss <- loess(price ~ carat, data = data)
+fit <- arrange(augment(modlss), carat)
+
+highchart() %>% 
+  hc_add_series(data, type = "scatter",
+                hcaes(x = carat, y = price, size = depth, group = cut)) %>%
+  hc_add_series(fit, type = "line", hcaes(x = carat, y = .fitted),
+                name = "Fit", id = "fit") %>% 
+  hc_add_series(fit, type = "arearange",
+                hcaes(x = carat, low = .fitted - 2*.se.fit,
+                      high = .fitted + 2*.se.fit),
+                linkedTo = "fit")
+
+```
+
+As given in the example the graph is plotted using three series comprising `Scatterplot`, `line`, and `Arearange` 
+
 
 
