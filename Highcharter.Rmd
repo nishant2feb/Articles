@@ -29,7 +29,7 @@ If you are reading this tutorial then I think you must be aware of `Ggplot2` pac
 
 Coming Back to Highcharter, So it is a `R` wrapper of **HighCharts** javascript library and its module.
 
-The main features of this packege is:
+The main features of this package are:
 
 * You can create various charts with same style like scatter, bubble, time series, heatmaps, treemaps, bar charts etc..
 * It supports various R objects.
@@ -94,7 +94,7 @@ pokemon%>%
 
 ```
 
-We can also use `hc_add_series` to plot the chart.
+We can also use `hc_add_series` to plot the chart. It is used for adding and removing series from highchart object.
 
 ### Scatterplot
 ```{r, message=FALSE, warning=FALSE}
@@ -106,17 +106,8 @@ highchart()%>%
 
 The main difference in ggplot2's geom_ functions and hc_add_series is that we need to add data and aesthetics explicitly in every function while in ggplot2 one can add data and aesthetics in a layer and then can further add more geoms which can work on same data and aesthetics.
 
-```{r message=FALSE, warning=FALSE}
 
-highchart()%>%
-  hc_add_series(pokemon, "scatter", hcaes(x = height, y = weight))%>%
-  hc_add_series(pokemon, "line", hcaes(x = height, y = weight))
-  
-
-```
-
-
-A more accurate example is given below using diamond dataset in ggplot2 package.
+A accurate example is given below using diamond dataset in ggplot2 package.
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -141,6 +132,9 @@ highchart() %>%
 ```
 
 As given in the example the graph is plotted using three series comprising `Scatterplot`, `line`, and `Arearange` 
+
+
+Lets replicate a highcharts developement into R.
 
 
 
