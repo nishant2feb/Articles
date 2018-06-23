@@ -14,6 +14,7 @@ library(highcharter)
 library(ggplot2)
 library(dplyr)
 library(broom)
+library(quantmod)
 data("pokemon")
 ```
 
@@ -134,7 +135,131 @@ highchart() %>%
 As given in the example the graph is plotted using three series comprising `Scatterplot`, `line`, and `Arearange` 
 
 
-Lets replicate a highcharts developement into R.
+Lets replicate a highcharts javasript developement into R using hc_add_series.
 
+
+>{
+>  chart: {
+>      type: "area"
+>  },
+>  title: {
+>      text: "Historic and Estimated Worldwide Population Distribution >by Region"
+>  },
+>  subtitle: {
+>      text: "Source: Wikipedia.org"
+>  },
+>  xAxis: {
+>      categories: ["1750", "1800", "1850", "1900", "1950", "1999", >"2050"],
+>      tickmarkPlacement: "on",
+>      title: {
+>          enabled: false
+>      }
+>  },
+>  yAxis: {
+>      title: {
+>          text: "Percent"
+>      }
+>  },
+>  tooltip: {
+>      pointFormat: "<span >style="color:{series.color}">{series.name}</span>:
+>      <b>{point.percentage:.1f}%</b> ({point.y:,.0f} millions)<br/>",
+>      shared: true
+>  },
+>  plotOptions: {
+>      area: {
+>          stacking: "percent",
+>          lineColor: "#ffffff",
+>          lineWidth: 1,
+>          marker: {
+>              lineWidth: 1,
+>              lineColor: "#ffffff"
+>          }
+>      }
+>  },
+>  series: [{
+>      name: "Asia",
+>      data: [502, 635, 809, 947, 1402, 3634, 5268]
+>  }, {
+>      name: "Africa",
+>      data: [106, 107, 111, 133, 221, 767, 1766]
+>  }, {
+>      name: "Europe",
+>      data: [163, 203, 276, 408, 547, 729, 628]
+>  }, {
+>      name: "America",
+>      data: [18, 31, 54, 156, 339, 818, 1201]
+>  }, {
+>      name: "Oceania",
+>     data: [2, 2, 2, 6, 13, 30, 46]
+>  }]
+>}
+
+```{r, message=FALSE, warning=FALSE}
+
+highchart() %>% 
+  hc_chart(type = "area") %>% 
+  hc_title(text = "Historic and Estimated Worldwide Population Distribution by Region") %>% 
+  hc_subtitle(text = "Source: Wikipedia.org") %>% 
+  hc_xAxis(categories = c("1750", "1800", "1850", "1900", "1950", "1999", "2050"),
+           tickmarkPlacement = "on",
+           title = list(enabled = FALSE)) %>% 
+  hc_yAxis(title = list(text = "Percent")) %>% 
+  hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
+             <b>{point.percentage:.1f}%</b> ({point.y:,.0f} millions)<br/>",
+             shared = TRUE) %>% 
+  hc_plotOptions(area = list(
+     stacking = "percent",
+     lineColor = "#ffffff",
+     lineWidth = 1,
+     marker = list(
+       lineWidth = 1,
+       lineColor = "#ffffff"
+       ))
+     ) %>% 
+  hc_add_series(name = "Asia", data = c(502, 635, 809, 947, 1402, 3634, 5268)) %>% 
+  hc_add_series(name = "Africa", data = c(106, 107, 111, 133, 221, 767, 1766)) %>%
+  hc_add_series(name = "Europe", data = c(163, 203, 276, 408, 547, 729, 628)) %>% 
+  hc_add_series(name = "America", data = c(18, 31, 54, 156, 339, 818, 1201)) %>% 
+  hc_add_series(name = "Oceania", data = c(2, 2, 2, 6, 13, 30, 46)) 
+
+
+```
+
+While comparing you can see each of the block of javascript code convereted into R functions pipelined to each other.
+We cab see few arguments like hctooltip's pointFormat in the format used as same in Javascript code you can look into details in [this](http://api.highcharts.com/highcharts#tooltip).
+
+
+## Highstocks
+
+Highstocks are charts for Financial and time seies analysis, it works well with `quamtmod` library and it's easy chart symbols and then you can add more series using `hc_add_series`.
+
+```{r, message=FALSE, warning=FALSE}
+
+x <- getSymbols("GOOG", auto.assign = FALSE)
+
+hchart(x)
+
+```
+
+As in the chart we don't need to add additional code, hchart accomodated with xts object very efficiently providing a dynamic snapshot of the data.
+You can use the zoom functionality to drill down the data in smaller chunks for better analysis.
+
+Lets use hc_add_series.
+
+```{r, message=FALSE, warning=FALSE}
+
+y <- getSymbols("AMZN", auto.assign = FALSE)
+
+highchart(type = "stock") %>% 
+  hc_add_series(x) %>% 
+  hc_add_series(y, type = "ohlc")
+
+```
+
+As you can see the visulalization adjusting the large volume of data very efficiently.
+
+Do try the stock with different xts objects.
+
+## Highmaps
 
 
