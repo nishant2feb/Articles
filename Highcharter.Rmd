@@ -262,4 +262,55 @@ Do try the stock with different xts objects.
 
 ## Highmaps
 
+The easiest way to chart a map with highcharter is using `hcmap` function. Select a url from the highmaps [collection](https://code.highcharts.com/mapdata/) and use the url as a map in hcmap function. This will download the map and create a object using the info as a mapdata argument.
+
+Lets plot India's map.
+
+```{r, message=FALSE, warning=FALSE}
+
+hcmap("https://code.highcharts.com/mapdata/countries/in/in-all.js")%>%
+  hc_title(text = "India")
+
+```
+
+Well that's a plain map what about converting it into choropleths.
+
+Every map data downloaded from highcharts map collection have keys to join data. There are 2 functions to help to know what are the regions coded to know how to join the map and data:
+
+* download_map_data: Download the geojson data from the highcharts collection.
+* get_data_from_map: Get the properties for each region in the map, as the keys from the map data.
+
+```{r, message=FALSE, warning=FALSE}
+
+mapdata <- get_data_from_map(download_map_data("https://code.highcharts.com/mapdata/countries/in/in-all.js"))
+
+glimpse(mapdata)
+
+#population state wise
+pop = as.data.frame(c(84673556, 1382611, 31169272, 103804637, 1055450, 25540196, 342853, 242911, 18980000, 1457723, 60383628, 25353081, 6864602, 
+12548926, 32966238, 61130704, 33387677, 64429, 72597565, 112372972, 2721756, 2964007, 1091014, 1980602, 41947358, 1244464, 
+27704236, 68621012, 607688, 72138958, 3671032, 207281477, 10116752,91347736))
+
+state= mapdata%>%
+  select(`hc-a2`)%>%
+  arrange(`hc-a2`)
+ 
+State_pop = as.data.frame(c(state, pop))
+names(State_pop)= c("State", "Population")
+
+hcmap("https://code.highcharts.com/mapdata/countries/in/in-all.js", data = State_pop, value = "Population",
+      joinBy = c("hc-a2", "State"), name = "Fake data",
+      dataLabels = list(enabled = TRUE, format = '{point.name}'),
+      borderColor = "#FAFAFA", borderWidth = 0.1,
+      tooltip = list(valueDecimals = 0)) 
+
+```
+
+Do some experiments with hc_add_series in the maps and choropleths. For some details and examples visit [here](http://jkunst.com/highcharter/highmaps.html).
+
+## PlugIns 
+
+Now lets try some plug ins provided by highcharter like motion drilldowns, grouping, downloading, printing data, and some awesome themes.
+
+
 
