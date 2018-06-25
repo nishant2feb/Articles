@@ -15,6 +15,8 @@ library(ggplot2)
 library(dplyr)
 library(broom)
 library(quantmod)
+library(tidyverse)
+library(lubridate)
 data("pokemon")
 ```
 
@@ -310,7 +312,187 @@ Do some experiments with hc_add_series in the maps and choropleths. For some det
 
 ## PlugIns 
 
-Now lets try some plug ins provided by highcharter like motion drilldowns, grouping, downloading, printing data, and some awesome themes.
+Now lets try some plug ins provided by highcharter like grouping, drilldowns, downloading, printing data, and some awesome themes.
+
+Lets group data of mpg dataset, here for better visiualisation we created a list which categorises data according to the manufacturer.
+
+```{r message=FALSE, warning=FALSE}
+
+data(mpg, package = "ggplot2")
+
+mpgg <- mpg %>% 
+  filter(class %in% c("suv", "compact", "midsize")) %>% 
+  group_by(class, manufacturer) %>% 
+  summarize(count = n())
+
+categories_grouped <- mpgg %>% 
+  group_by(name = class) %>% 
+  do(categories = .$manufacturer) %>% 
+  list_parse()
+
+highchart() %>% 
+  hc_xAxis(categories = categories_grouped) %>% 
+  hc_add_series(data = mpgg, type = "bar", hcaes(y = count, color = manufacturer),
+                showInLegend = FALSE)
+
+```
+
+Lets create a chart which drill downs to another chart for better analysis.
+You can understand the code more efficiently if you understand lists in R.
+
+```{r message=FALSE, warning=FALSE}
+
+df <- data_frame(
+  name = c("Animals", "Fruits", "Cars"),
+  y = c(5, 2, 4),
+  drilldown = tolower(name)
+)
 
 
+ds <- list_parse(df)
+names(ds) <- NULL
+
+
+hc <- highchart() %>% 
+  hc_chart(type = "column") %>% 
+  hc_title(text = "Basic drilldown") %>% 
+  hc_xAxis(type = "category") %>% 
+  hc_legend(enabled = FALSE) %>% 
+  hc_plotOptions(
+    series = list(
+      boderWidth = 0,
+      dataLabels = list(enabled = TRUE)
+    )
+  ) %>% 
+  hc_add_series(
+    name = "Things",
+    colorByPoint = TRUE,
+    data = ds
+  )
+
+dfan <- data_frame(
+  name = c("Cats", "Dogs", "Cows", "Sheep", "Pigs"),
+  value = c(4, 3, 1, 2, 1)
+)
+
+dffru <- data_frame(
+  name = c("Apple", "Organes"),
+  value = c(4, 2)
+)
+
+dfcar <- data_frame(
+  name = c("Toyota", "Opel", "Volkswage"),
+  value = c(4, 2, 2) 
+)
+
+second_el_to_numeric <- function(ls){
+  
+  map(ls, function(x){
+    x[[2]] <- as.numeric(x[[2]])
+    x
+  })
+  
+}
+
+dsan <- second_el_to_numeric(list_parse2(dfan))
+
+dsfru <- second_el_to_numeric(list_parse2(dffru))
+
+dscar <- second_el_to_numeric(list_parse2(dfcar))
+
+hc %>% 
+  hc_drilldown(
+    allowPointDrilldown = TRUE,
+    series = list(
+      list(
+        id = "animals",
+        data = dsan
+      ),
+      list(
+        id = "fruits",
+        data = dsfru
+      ),
+      list(
+        id = "cars",
+        data = dscar
+      )
+    )
+  )
+
+```
+
+Lets apply Drill down on other charts.
+
+```{r message=FALSE, warning=FALSE}
+
+tm <- pokemon %>% 
+  mutate(type_2 = ifelse(is.na(type_2), paste("only", type_1), type_2),
+         type_1 = type_1) %>% 
+  group_by(type_1, type_2) %>%
+  summarise(n = n()) %>% 
+  ungroup() %>% 
+  treemap::treemap(index = c("type_1", "type_2"),
+                   vSize = "n", vColor = "type_1")
+
+tm$tm <- tm$tm %>%
+  tbl_df() %>% 
+  left_join(pokemon %>% select(type_1, type_2, color_f) %>% distinct(), by = c("type_1", "type_2")) %>%
+  left_join(pokemon %>% select(type_1, color_1) %>% distinct(), by = c("type_1")) %>% 
+  mutate(type_1 = paste0("Main ", type_1),
+         color = ifelse(is.na(color_f), color_1, color_f))
+
+highchart() %>% 
+  hc_add_series_treemap(tm, allowDrillToNode = TRUE,
+                        layoutAlgorithm = "squarified")
+
+```
+
+Lets add functionality of exporting data.
+
+```{r message=FALSE, warning=FALSE}
+
+pokemon%>%
+  count(type_1)%>%
+  arrange(n)%>%
+  hchart(type = "bar", hcaes(x = type_1, y = n, color = type_1))%>%
+  hc_exporting(enabled = TRUE)
+
+```
+
+At last we add some themes.
+
+```{r message=FALSE, warning=FALSE}
+
+pokemon%>%
+  count(type_1)%>%
+  arrange(n)%>%
+  hchart(type = "bar", hcaes(x = type_1, y = n, color = type_1))%>%
+  hc_exporting(enabled = TRUE)%>%
+hc_add_theme(hc_theme_chalk())
+
+```
+You can learn a lot from [here](http://jkunst.com/highcharter/themes.html), Its a complete library for Highcharter.
+I am also sharing one of my favourite graph created on weather dataset, here one of the intersting argument `polar` is used by setting the argument to TRUE the whole story is transformed.
+
+```{r message=FALSE, warning=FALSE}
+
+data("weather")
+
+x <- c("Min", "Mean", "Max")
+y <- sprintf("{point.%s}", c("min_temperaturec", "mean_temperaturec", "max_temperaturec"))
+tltip <- tooltip_table(x, y)
+
+hchart(weather, type = "columnrange",
+       hcaes(x = date, low = min_temperaturec, high = max_temperaturec,
+             color = mean_temperaturec)) %>% 
+  hc_chart(polar = TRUE) %>%
+  hc_yAxis( max = 30, min = -10, labels = list(format = "{value} C"),
+            showFirstLabel = FALSE) %>% 
+  hc_xAxis(
+    title = list(text = ""), gridLineWidth = 0.5,
+    labels = list(format = "{value: %b}")) %>% 
+  hc_tooltip(useHTML = TRUE, pointFormat = tltip,
+             headerFormat = as.character(tags$small("{point.x:%d %B, %Y}")))
+
+```
 
