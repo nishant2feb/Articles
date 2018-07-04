@@ -1,0 +1,28 @@
+---
+title: "Anomalize"
+author: "Nishant"
+date: "July 4, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Anaomalize: Brief Description
+
+When we talk about anomalies we consider the data points that are outliers or an exceptional event. Identifying those events are easy in small data sets and can be done some simple analysis graphs like boxplots. But the cases will simultaneously get complicated when switched to large data sets, escpecially in the case of time series. Time series is the data captured on a fixed interval of time over a time period, when analysed shows a trend or seasonality. Identifying anomalies in these cases is kind of tricky aspect.
+
+
+Then comes anomalize package for anomaly detection in time series analysis, its a tidy anomaly detection algorithm that's time based and scalable from one to many time series.
+
+There are some available packages and methods that helps in its development or you can say that its a combination of available resources with an scalable approach.
+
+The open source work that helped are as follow:
+
+* Twitter's AnomalyDetection package: Available on Github(cran anaomalyDetection is a different work).
+* Rob Hyndman's forecast::tsoutliers() function available through forecast package.
+* Javier Lopez-de-lacalle's package, tsoutliers, on CRAN.
+
+
+These all packages and functions are used to integrate into a scalable workflow.
