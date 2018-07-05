@@ -9,6 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(tibbletime)
+library(anomalize)
+
+```
+
+
 # Anaomalize: Brief Description
 
 When we talk about anomalies we consider the data points that are outliers or an exceptional event. Identifying those events are easy in small data sets and can be done some simple analysis graphs like boxplots. But the cases will simultaneously get complicated when switched to large data sets, escpecially in the case of time series. Time series is the data captured on a fixed interval of time over a time period, when analysed shows a trend or seasonality. Identifying anomalies in these cases is kind of tricky aspect.
@@ -26,3 +35,63 @@ The open source work that helped are as follow:
 
 
 These all packages and functions are used to integrate into a scalable workflow.
+
+Talking about the workflow of anomalize, it is divided into three parts:
+
+* Time series decomposition with `time_decompose()`.
+* Anomaly detection of remainder with `anomalize()`.
+* Anomaly lower and upper bound transformation with `time_recompose()`.
+
+
+# Workflow of Anomaly detection
+
+## time series decomposition 
+
+The first step is time series decomposition using time_decompose(). The measure value or the numerical value on which detection needs to be perfomed for a particular group is decomposed into four columns that are **observed**, **season**, **trend**, and **remainder**. The default method used for decomposition is **stl**, which is a seasonal decomposition using a Loess smoother.
+
+Loess regression is the most common method used to smoothen a volatile time series, it fits multiple regression in local neighborhood, you can also say that the data is divided and regression is applied on each part, which is useful in time series because we know the bound of time which is X variable in this case. This method works well in the case where trend dominates the seasonality of the time series. 
+
+Here trend is long term growth that happen over many observations and seasonality is the cyclic pattern occuring on a daily cycle for minute or hour or weekly.
+
+There is a second technique which you can use for seasonal decomposition in time series based on meadian that is `Twitter` method which is also used `AnomalyDetection` package. It is identical to STL fopr removing the seasonal component, the difference is in removing the trend is that it uses piece wise median of the data(one or several median split at specified intervals) rather than fitting a smoother. This method works well where seasonality dominates the trend in time series.
+
+Lets talk about the output of the `time_decompose()` function, as discussed above it produces 4 columns:
+
+* observed : The actual values.
+* season : The seasonal or cyclic trend. The default is a weekly seasonality.
+* trend : The long term trend. The default is a span of 3 months.
+* remainder : It is used for analysing the outliers. It is simply the observed minus both the season and trend.
+
+The time_decompose() function contains an argument `merge`, by setting it TRUE we can keep the original data along with the produced columns. 
+
+# Detecting anomalies in the remainders
+
+After the time series analysis is complete and the remainder has the desired characteristics to perform anomaly detection which again creates three new columns.
+
+* remainder_l1 : The lower limit of the remainder.
+* remainder_l2 : The upper limit of the remainder.
+* anaomaly : Column telling whether observation is an anomaly or not.
+
+Anomalies are high leverage points that distort the distribution. The anomalize implements two methods that are resistant to high leverage points:
+
+* IQR: Inner Quartile Range
+* GESD: Generalized Extreme Studentized Deviate Test
+
+## IQR
+
+It is similar method used in tsoutliers() function of the forecast package. In IQR a distribution is taken and 25% and 75% inner quartile range to establish the distribution of the remainder. Limits are set by default to a factor of 3 times above and below the inner quartile range any remainder beyond the limit is considered as an anomaly.
+
+## GESD
+
+In GESD anomalies are progressively evaluated removing the worst offenders and recalculating the test statistics and critical values or in simpler way you can say that a range is recalculated after idenfying the anomalies in an iterative way.
+
+
+> Both IQR and GESD have their Pros and cons, IQR is compartively faster as 
+> there are no loops involved in the IQR but its not as accurate as GESD since > the anomalies skews the median which is removed in GESD.
+
+
+
+
+
+
+ 
