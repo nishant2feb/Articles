@@ -64,7 +64,7 @@ Lets talk about the output of the `time_decompose()` function, as discussed abov
 
 The time_decompose() function contains an argument `merge`, by setting it TRUE we can keep the original data along with the produced columns. 
 
-# Detecting anomalies in the remainders
+## Detecting anomalies in the remainders
 
 After the time series analysis is complete and the remainder has the desired characteristics to perform anomaly detection which again creates three new columns.
 
@@ -77,21 +77,29 @@ Anomalies are high leverage points that distort the distribution. The anomalize 
 * IQR: Inner Quartile Range
 * GESD: Generalized Extreme Studentized Deviate Test
 
-## IQR
+### IQR
 
 It is similar method used in tsoutliers() function of the forecast package. In IQR a distribution is taken and 25% and 75% inner quartile range to establish the distribution of the remainder. Limits are set by default to a factor of 3 times above and below the inner quartile range any remainder beyond the limit is considered as an anomaly.
 
-## GESD
+### GESD
 
 In GESD anomalies are progressively evaluated removing the worst offenders and recalculating the test statistics and critical values or in simpler way you can say that a range is recalculated after idenfying the anomalies in an iterative way.
 
 
-> Both IQR and GESD have their Pros and cons, IQR is compartively faster as 
-> there are no loops involved in the IQR but its not as accurate as GESD since > the anomalies skews the median which is removed in GESD.
+> Both IQR and GESD have their Pros and cons, IQR is comparatively faster as 
+> there are no loops involved in the IQR but its not as accurate as GESD since
+> the anomalies skews the median which is removed in GESD.
 
 
+## Anomaly lower and upper bound transformation
+
+The last step of the workflow is to create lower and upper bounds around the observed values with `time_recompose`. It recomposes the season, trend, remainder_l1 and remainder_l2 into new limits that are:
+
+* recomposed_l1 : The lower bound of outliers around the observed values.
+* recomposed_l2 : The upper bound of outliers around the observed values.
 
 
+# Tuning parameters 
 
 
  
