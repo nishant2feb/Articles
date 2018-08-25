@@ -1,0 +1,21 @@
+---
+title: "Debug with debugr"
+author: "Nishant"
+date: "August 25, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+When we talk about in debugging in R, there is a slight negative aspect in people who work on python based and other programming IDEs. There are some useful functions in R itself like 
+
+
+
+
+f <- function(a) g(a)
+g <- function(b) h(b)
+h <- function(c) i(c)
+i <- function(d) "a" + d
+f(10)
