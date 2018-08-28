@@ -9,13 +9,62 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-When we talk about in debugging in R, there is a slight negative aspect in people who work on python based and other programming IDEs. There are some useful functions in R itself like 
+
+Debugging is the art and science of fixing unexpected problems in your code. 
+
+> "Finding your bug is a process of confirming the many things that you believe are true - until you find one which is not true."
+> -Norm Matloff
+
+When we talk about in debugging in R, there is a slight negative aspect in people who work on python and other programming IDEs. There are some useful functions in R itself like functions like traceback() and browser(), and interactive tools in RStudio.
+
+### There are three key debugging tools:
+
+* RStudio's error inspector and traceback() which list the sequence of calls that lead to the error.
+
+* RStudio's "Rerun with Debug" tool and options(error = browser) which open an interactive session where the error occurred.
+
+* RStudio's breakpoints and browser() which open an interactive session at an arbitrary location in the code.
 
 
+Determining the sequence of calls
 
+```{r}
 
 f <- function(a) g(a)
 g <- function(b) h(b)
 h <- function(c) i(c)
-i <- function(d) "a" + d
+i <- function(d) j(d)
+j <- function(e) "a" + e
+
 f(10)
+
+```
+
+
+### Browsing on error
+
+As well as any regular R function, there are a few special commands you can use in debug mode. You can access them either with the RStudio toolbar() or with the keyboard:
+
+* Next, n: executes the next step in the function. Be careful if you have a variable named n; to print it you'll need to do print(n).
+
+* Step into,  or s: works like next, but if the next step is a function, it will step into that function so you can work through each line.
+
+* Finish,  or f: finishes execution of the current loop or function.
+
+* Continue, c: leaves interactive debugging and continues regular execution of the function. This is useful if you've fixed the bad state and want to check that the function proceeds correctly.
+
+* Stop, Q: stops debugging, terminates the function, and returns to the global workspace. Use this once you've figured out where the problem is, and you're ready to fix it and reload the code.
+
+
+### Browsing arbitrary code
+
+As well as entering an interactive console on error, you can enter it at an arbitrary code location by using either an Rstudio breakpoint or browser(). You can set a breakpoint in Rstudio by clicking to the left of the line number, or pressing Shift + F9. Equivalently, add browser() where you want execution to pause. Breakpoints behave similarly to browser() but they are easier to set (one click instead of nine key presses), and you don't run the risk of accidentally including a browser() statement in your source code. There are two small downsides to breakpoints:
+
+* There are a few unusual situations in which breakpoints will not work: read (breakpoint troubleshooting)[https://support.rstudio.com/hc/en-us/articles/200534337-Breakpoint-Troubleshooting] for more details.
+
+* RStudio currently does not support conditional breakpoints, whereas you can always put browser() inside an if statement.
+
+
+Now lets talk about the package `debugr`, 
+
+
