@@ -64,7 +64,48 @@ As well as entering an interactive console on error, you can enter it at an arbi
 
 * RStudio currently does not support conditional breakpoints, whereas you can always put browser() inside an if statement.
 
+For details on these debugging methods visit here(https://support.rstudio.com/hc/en-us/articles/205612627-Debugging-with-RStudio).
 
-Now lets talk about the package `debugr`, 
+
+**Now lets talk about the package `debugr`.**
+
+Debugr supports a more simpler aspect of debugging which is easy to understand if you are involved in less debugging work.
+Debugr has few simple functions that are:
+
+* debugr_isActive :-	Switching debug mode on and off.
+* debugr_switchOff :-	Switching debug mode on and off.
+* debugr_switchOn :-	Switching debug mode on and off.
+* dwatch :-	Printing debug outputs during runtime.
+
+Out of all these functions dwatch plays the most important role, it prints a debug output to a console or a file in a more complicate case. The output can be static text , one or many values of the variables.
+
+For any debugging function you need switch on the debugging functionality of debugr which is easily done by `debug_switchOn()`. You can put your dwatch() function anywhere you want to debug the code sepcially in production level code and debug it whenever a situation came by switching it on and later switch it off by using `debugr_switchOff()` function.
+
+Lets look at the structure of dwatch function in a sample code.
+
+```{r warning=FALSE}
+
+library(debugr)
+
+debugr_switchOn()
+
+myfunction <- function(x) {
+  
+  z <- 1
+
+  for(i in 1:x) {
+    dwatch(crit = "z > 40000", objs = c("z", "i"))
+    z <- z * i
+  }
+  # avoiding to print the z
+  invisible(z)
+}
+
+myfunction(10)
+
+debugr_switchOff()
+
+```
+
 
 
