@@ -2,7 +2,9 @@
 title: "Debug with debugr"
 author: "Nishant"
 date: "August 25, 2018"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
@@ -12,10 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Debugging is the art and science of fixing unexpected problems in your code. 
 
-> "Finding your bug is a process of confirming the many things that you believe are true - until you find one which is not true."
-> -Norm Matloff
-
-When we talk about in debugging in R, there is a slight negative aspect in people who work on python and other programming IDEs. There are some useful functions in R itself like functions like traceback() and browser(), and interactive tools in RStudio.
+When we talk about in debugging in R, there is a slight negative aspect in people who work on python and other programming IDEs. There are some useful functions in R itself like traceback() and browser(), and interactive tools in RStudio.
 
 ### There are three key debugging tools:
 
@@ -25,10 +24,7 @@ When we talk about in debugging in R, there is a slight negative aspect in peopl
 
 * RStudio's breakpoints and browser() which open an interactive session at an arbitrary location in the code.
 
-
-Determining the sequence of calls
-
-```{r}
+Lets draw a function mentioned below and apply these methods.
 
 f <- function(a) g(a)
 g <- function(b) h(b)
@@ -38,22 +34,25 @@ j <- function(e) "a" + e
 
 f(10)
 
-```
+![Snapshot of the error by running the program](Capture1.png)
 
+![Browsing the error](Capture2.png)
+
+![Using Traceback](Capture3.png)
 
 ### Browsing on error
 
-As well as any regular R function, there are a few special commands you can use in debug mode. You can access them either with the RStudio toolbar() or with the keyboard:
+When you are debugging using previous methods then there are a few special commands you can use in debug mode. You can access them either with the [!RStudio toolbar()](Capture4.png) or with the keyboard:
 
-* Next, n: executes the next step in the function. Be careful if you have a variable named n; to print it you'll need to do print(n).
+* ![Next](Capture5.png), n: executes the next step in the function. Be careful if you have a variable named n; to print it you'll need to do print(n).
 
-* Step into,  or s: works like next, but if the next step is a function, it will step into that function so you can work through each line.
+* ![Step into](Capture6.png),  or s: works like next, but if the next step is a function, it will step into that function so you can work through each line.
 
-* Finish,  or f: finishes execution of the current loop or function.
+* ![Finish](Capture7.png),  or f: finishes execution of the current loop or function.
 
-* Continue, c: leaves interactive debugging and continues regular execution of the function. This is useful if you've fixed the bad state and want to check that the function proceeds correctly.
+* [!Continue](Capture8.png), c: leaves interactive debugging and continues regular execution of the function. This is useful if you've fixed the bad state and want to check that the function proceeds correctly.
 
-* Stop, Q: stops debugging, terminates the function, and returns to the global workspace. Use this once you've figured out where the problem is, and you're ready to fix it and reload the code.
+* ![Stop](Capture9.png), Q: stops debugging, terminates the function, and returns to the global workspace. Use this once you've figured out where the problem is, and you're ready to fix it and reload the code.
 
 
 ### Browsing arbitrary code
@@ -107,5 +106,37 @@ debugr_switchOff()
 
 ```
 
+Here the code is going through iterative multiplication or you can apply any case used in your functions, the dwatch function applied on the variable z with the criteria **z > 4000**. So as a result messages are printed when criteria is fullfilled and desired results got printed that is values of z and i variables.
+
+
+You can use some sophisticated arguments that manipulates the fromat of the output.
+
+```{r warning=FALSE}
+debugr_switchOn()
+
+myfunction <- function(x) {
+  
+  z <- 1
+
+  for(i in 1:x) {
+    dwatch(crit = "z > 40000", expr=c("format(z, big.mark = \",\")", "format(i, big.mark = \",\")"))
+    z <- z * i
+  }
+  # avoiding to print the z
+  invisible(z)
+}
+
+myfunction(10)
+
+debugr_switchOff()
+
+```
+
+There are few more arguments that you can incorporate:
+
+* show.all : By setting this argument `TRUE` you can see all objects for the criteria.
+* msg : It is used to add a static text message.
+* show.frame : By setting this argument as `FALSE` you can remove upper and lower border.
+* halt : By setting this argument as `TRUE` you can stop the transaction as soon as the criteria is fullfilled.
 
 
