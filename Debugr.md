@@ -1,21 +1,24 @@
-Debugging is the art and science of fixing unexpected problems in your
-code.
+In this tutorial you will learn about debugging in R in Rstudio and
+using debugr package.
 
 When we talk about in debugging in R, there is a slight negative aspect
 in people who work on python and other programming IDEs. There are some
 useful functions in R itself like traceback() and browser(), and
-interactive tools in RStudio.
+interactive tools in RStudio but somehow there are few limitations which
+is not handled by built in functionalities, In such scenarios we got
+stuck with our issues and that takes much more time to resolve.
 
-### There are three key debugging tools:
+Then arrive the `debugr` package which you can use while writing complex
+methods and loops which shows you the runtime variable entries and
+assist in solving the bug in much less time, although you require a
+preplanning for code entries and the points on action for debugr but its
+worth to give some time in it than resolving the issue in hard way at
+the time of its execution.
 
--   RStudio’s error inspector and traceback() which list the sequence of
-    calls that lead to the error.
+### Aspects of debugging in Rstudio
 
--   RStudio’s “Rerun with Debug” tool and options(error = browser) which
-    open an interactive session where the error occurred.
-
--   RStudio’s breakpoints and browser() which open an interactive
-    session at an arbitrary location in the code.
+Rstudio provides an interactive platform for debugging that makes
+detecting bugs in complex functions much easier
 
 Lets draw a function mentioned below and apply these methods.
 
@@ -26,56 +29,56 @@ f(10)
 
 ![Snapshot of the error by running the program](Capture1.png)
 
+here you can browse to different functions to check the code in an
+iterative way. The function you browse will show its code.
+
 ![Browsing the error](Capture2.png)
 
 ![Using Traceback](Capture3.png)
 
-### Browsing on error
+You can use traceback to see the flow of function calls made by
+individual ones.
 
-When you are debugging using previous methods then there are a few
-special commands you can use in debug mode. You can access them either
-with the [!RStudio toolbar()](Capture4.png) or with the keyboard:
+### Debugging on error
 
--   ![Next](Capture5.png), n: executes the next step in the function. Be
-    careful if you have a variable named n; to print it you’ll need to
-    do print(n).
+While executing code in Rstudio if an error comes then Rstudio provides
+two methods its interactive console one is traceback, that shows you the
+flow of the function calls and the other is Rerun with debug. If you
+choose rerun with debug Rstudio will take you to the interactive
+debugger session which also pause the execution where error occurred.
 
--   ![Step into](Capture6.png), or s: works like next, but if the next
-    step is a function, it will step into that function so you can work
-    through each line.
+When you are in the editor you can use either with the [!RStudio
+toolbar()](Capture4.png) or with the keyboard to move in debugging
+steps:
+
+-   ![Next](Capture5.png), n: This button will take you to the next
+    step.
+
+-   ![Step into](Capture6.png), or s: works like next, but instead of
+    next step it steps into next function.
 
 -   ![Finish](Capture7.png), or f: finishes execution of the current
     loop or function.
 
--   [!Continue](Capture8.png), c: leaves interactive debugging and
-    continues regular execution of the function. This is useful if
-    you’ve fixed the bad state and want to check that the function
-    proceeds correctly.
+-   ![Continue](Capture8.png), c: leaves interactive debugging.
 
 -   ![Stop](Capture9.png), Q: stops debugging, terminates the function,
-    and returns to the global workspace. Use this once you’ve figured
-    out where the problem is, and you’re ready to fix it and reload the
-    code.
+    and returns to the global workspace.
 
-### Browsing arbitrary code
+### Setting Break points in arbitrary code
 
-As well as entering an interactive console on error, you can enter it at
+Rstudio enters in an interactive console on error, but you can enter at
 an arbitrary code location by using either an Rstudio breakpoint or
-browser(). You can set a breakpoint in Rstudio by clicking to the left
-of the line number, or pressing Shift + F9. Equivalently, add browser()
-where you want execution to pause. Breakpoints behave similarly to
-browser() but they are easier to set (one click instead of nine key
-presses), and you don’t run the risk of accidentally including a
-browser() statement in your source code. There are two small downsides
-to breakpoints:
+browser().
 
--   There are a few unusual situations in which breakpoints will not
-    work: read (breakpoint
-    troubleshooting)\[<https://support.rstudio.com/hc/en-us/articles/200534337-Breakpoint-Troubleshooting>\]
-    for more details.
+The breakpoint can be added through several methods: 1. You can click on
+the left of the line of the code. 2. You can press Shift+F9 on the line
+of the code. 3. You can add browser() where execution needs to be
+stopped.
 
--   RStudio currently does not support conditional breakpoints, whereas
-    you can always put browser() inside an if statement.
+-   RStudio currently does not support conditional breakpoints that is
+    putting a breakpoint by passing a criteria, which is somewaht
+    handled in debugr package discussed in this tutorial. \*
 
 For details on these debugging methods visit
 here(<https://support.rstudio.com/hc/en-us/articles/205612627-Debugging-with-RStudio>).
@@ -201,7 +204,7 @@ myfunction(10)
 debugr_switchOff()
 ```
 
-There are few more arguments that you can incorporate:
+### There are few more arguments that you can incorporate:
 
 -   show.all : By setting this argument `TRUE` you can see all objects
     for the criteria.
