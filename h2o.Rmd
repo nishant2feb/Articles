@@ -14,9 +14,23 @@ knitr::opts_chunk$set(echo = TRUE)
 There is a lot of buzz for machine learning algorithms as well as requirement for its experts. We all know that there is a significant gap in the skill requirement.
 The motive of H2O is to provide a platform which made easy for the non experts to do experiments with machine learning.
 
-H2O's core code is written in java 
+H2O's core code is written in java that enables the whole framework for multi-threading.
+Although it is written in java but it provide interfaces for R, Python and Scala, thus enabling its use much easier.
 
 In crux we can say that H2O is an open source, in memory, distributed, fast and scalable machine learning and predictive analytics. In our code inputs we will define how H2O is performing each activity.
 
+### Installation process
+
+#### R
+
+If you want to use H2O functionality in R you can simply install package H2O using command `install.packages("h2o")`. 
+
+```{r warning=FALSE}
+library(h2o)
+
+h2o.init()
+
+h2o.shutdown()
+```
 
 
