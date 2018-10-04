@@ -30,7 +30,18 @@ library(h2o)
 
 h2o.init()
 
-h2o.shutdown()
 ```
+
+Initialising H2O might throw an error in your system in case if you dont have Jdk of 64 bit. If such issue arises please install latest Jdk of 64 bits, it will work smoothly afterwards.
+
+#### Python
+ 
+If you are using python the same method is applied in it too, from command line `pip install -U h2o` and h2o will be installed for your python enviornment. The same process will go on for initailising h2o.
+
+```{python}
+
+```
+
+
 
 
