@@ -1,0 +1,22 @@
+---
+title: "h2o"
+author: "Nishant"
+date: "October 4, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Describing H2O
+
+There is a lot of buzz for machine learning algorithms as well as requirement for its experts. We all know that there is a significant gap in the skill requirement.
+The motive of H2O is to provide a platform which made easy for the non experts to do experiments with machine learning.
+
+H2O's core code is written in java 
+
+In crux we can say that H2O is an open source, in memory, distributed, fast and scalable machine learning and predictive analytics. In our code inputs we will define how H2O is performing each activity.
+
+
+
