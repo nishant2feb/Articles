@@ -2,11 +2,14 @@
 title: "h2o"
 author: "Nishant"
 date: "October 4, 2018"
-output: html_document
+output: 
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
 ```
 
 ## Describing H2O
@@ -15,9 +18,9 @@ There is a lot of buzz for machine learning algorithms as well as requirement fo
 The motive of H2O is to provide a platform which made easy for the non experts to do experiments with machine learning.
 
 H2O's core code is written in java that enables the whole framework for multi-threading.
-Although it is written in java but it provide interfaces for R, Python and Scala, thus enabling its use much easier.
+Although it is written in java but it provide interfaces for R, Python and Scala, thus enabling its use much easy.
 
-In crux we can say that H2O is an open source, in memory, distributed, fast and scalable machine learning and predictive analytics. In our code inputs we will define how H2O is performing each activity.
+In crux we can say that H2O is an open source, in memory, distributed, fast and scalable machine learning and predictive analytics that allows to build machine learning models with an ease. 
 
 ### Installation process
 
@@ -34,11 +37,103 @@ h2o.init()
 
 Initialising H2O might throw an error in your system in case if you dont have Jdk of 64 bit. If such issue arises please install latest Jdk of 64 bits, it will work smoothly afterwards.
 
+
 #### Python
  
 If you are using python the same method is applied in it too, from command line `pip install -U h2o` and h2o will be installed for your python enviornment. The same process will go on for initailising h2o.
 
-```{python}
+```{python engine.path="C:/Users/nsingh1/AppData/Local/Continuum/Anaconda3/h2o_jar/h2o.jar"}
+
+import h2o
+h2o.init()
+
+```
+
+
+The h2o.init() command is pretty smart and does a lot of work. At first it looks for any active h2o instance before starting a new one and starts a new when instance are not present.
+
+It do have arguments which helps to accomodate resources to the h2o instance frequently used are:
+
+* nthreads: By default the value of nthreads will be -1 which means the instance can use all the cores of the CPU, we can set the number of cores utilized by passing the value to the argument.
+
+* max_mem_size: By passing value to this argument you can restrict the maximum memory allocated to the instance. Its is od string type can pass argument as '2g' or '2G' for 2 GBs of memeory, same when you want to allocate in MBs.
+
+
+Once instance is created you can access the flow by typing http://localhost:54321 in your browser.
+Flow is the name of the web interface that is part of h2o which does not require any extra installations which is wriiten in CoffeeScript(a JavaScript like language).
+You can use it for doing following things:
+
+* Upload data directly
+* View data uploaded by the client
+* Create models directly
+* View models created by you or your client
+* view predictions
+* Run preditcions directly
+
+The interface is quite useful and provide an ease of use to non experts.
+
+## AutoML
+
+Now talking about AutoML part of H2O, AutoML helps in automatic training and tuning of many models within a user specified time limit.
+
+The current version of AutoML function can train and cross validate a Random Forest, an Extremely-Randomized Forest, a random grid of Gradient Boosting Machines (GBMs), a random grid of Deep Neural Nets, and then trains a Stacked Ensemble using all of the models.
+
+Now lets deep dive in h2o.automl() or H2OAutoML() function. The 
+
+
+
+
+
+```{r}
+
+# Import a sample binary outcome train/test set into H2O
+train <- h2o.importFile("higgs_train_10k.csv")
+test <- h2o.importFile("higgs_test_5k.csv")
+
+# Identify predictors and response
+y <- "response"
+x <- setdiff(names(train), y)
+
+# For binary classification, response should be a factor
+train[,y] <- as.factor(train[,y])
+test[,y] <- as.factor(test[,y])
+
+aml <- h2o.automl(x = x, y = y,
+                  training_frame = train,
+                  max_runtime_secs = 300)
+
+# View the AutoML Leaderboard
+lb <- aml@leaderboard
+lb
+
+#                                                model_id       auc   logloss
+# 1    StackedEnsemble_AllModels_0_AutoML_20180503_085035 0.7816995 0.5603380
+# 2 StackedEnsemble_BestOfFamily_0_AutoML_20180503_085035 0.7780683 0.5636519
+# 3             GBM_grid_0_AutoML_20180503_085035_model_1 0.7742967 0.5656552
+# 4             GBM_grid_0_AutoML_20180503_085035_model_0 0.7736082 0.5667454
+# 5             GBM_grid_0_AutoML_20180503_085035_model_2 0.7704520 0.5695492
+# 6             GBM_grid_0_AutoML_20180503_085035_model_3 0.7662087 0.5759679
+#  mean_per_class_error      rmse       mse
+# 1            0.3250067 0.4361930 0.1902644
+# 2            0.3261921 0.4377744 0.1916464
+# 3            0.3233579 0.4390083 0.1927283
+# 4            0.3196441 0.4394696 0.1931335
+# 5            0.3443406 0.4411033 0.1945721
+# 6            0.3348417 0.4439429 0.1970853
+
+# [9 rows x 6 columns]
+
+# The leader model is stored here
+aml@leader
+
+# If you need to generate predictions on a test set, you can make
+# predictions directly on the `"H2OAutoML"` object, or on the leader
+# model object directly
+
+pred <- h2o.predict(aml, test)  # predict(aml, test) also works
+
+# or:
+pred <- h2o.predict(aml@leader, test)
 
 ```
 
