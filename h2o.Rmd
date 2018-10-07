@@ -22,9 +22,9 @@ Although it is written in java but it provide interfaces for R, Python and Scala
 
 In crux we can say that H2O is an open source, in memory, distributed, fast and scalable machine learning and predictive analytics that allows to build machine learning models with an ease. 
 
-### Installation process
+## Installation process
 
-#### R
+### R
 
 If you want to use H2O functionality in R you can simply install package H2O using command `install.packages("h2o")`. 
 
@@ -38,17 +38,11 @@ h2o.init()
 Initialising H2O might throw an error in your system in case if you dont have Jdk of 64 bit. If such issue arises please install latest Jdk of 64 bits, it will work smoothly afterwards.
 
 
-#### Python
+### Python
  
 If you are using python the same method is applied in it too, from command line `pip install -U h2o` and h2o will be installed for your python enviornment. The same process will go on for initailising h2o.
 
-```{python engine.path="C:/Users/nsingh1/AppData/Local/Continuum/Anaconda3/h2o_jar/h2o.jar"}
-
-import h2o
-h2o.init()
-
-```
-
+![Python Code](Capture2)
 
 The h2o.init() command is pretty smart and does a lot of work. At first it looks for any active h2o instance before starting a new one and starts a new when instance are not present.
 
@@ -70,7 +64,9 @@ You can use it for doing following things:
 * view predictions
 * Run preditcions directly
 
-The interface is quite useful and provide an ease of use to non experts.
+![flow](Capture1)
+
+The interface is quite useful and provide an ease of use to non experts, I would reccommend to try it and perform some experiments of your own.
 
 ## AutoML
 
@@ -78,64 +74,62 @@ Now talking about AutoML part of H2O, AutoML helps in automatic training and tun
 
 The current version of AutoML function can train and cross validate a Random Forest, an Extremely-Randomized Forest, a random grid of Gradient Boosting Machines (GBMs), a random grid of Deep Neural Nets, and then trains a Stacked Ensemble using all of the models.
 
-Now lets deep dive in h2o.automl() or H2OAutoML() function. The 
+When we say AutoML it should cater the aspects of data preparation, Model generation and Ensembles and also provide few parameters as possible so that users can perform tasks with much less confusion. H2o AutoML do performs this task in ease and minimal parameter passed by the user.
+
+In both R and Python API, it uses same data related arguments `x`, `y`, `training_frame`, `validation frame` out of which `y` and `training_frame` are required parameter and rest are optional. You can also configure values for `max_runtime_sec` amd `max_models` here `max_runtime_sec` parameter is required and `max_model` is optional if you don't pass any parameter it takes NULL by default.
+
+The `x` parameter is the vector of predictors from `training_frame` if you don't want to use all predictors from frame you passed you can set it by passing it to `x`.
+
+Now lets talk about some optional and miscellaneous parameters, try to tweak the parameters even if you don't know about it, it will lead you to gain knowledge over some advance topics:
+
+* validation_frame: This parameter is used for early stopping of individual models in the automl. It is data frame that you pass for validation of a model or can be a part of training data if not passed by you.
+
+* leaderboard_frame: If passed the models will be scored according to the values instead of using cross validation metrics. Again the values are a part of training data if not passed by you.
+
+* nfolds: K-fold cross validation by default 5, can be used to decrease the model perdormance.
+
+* fold_columns: Specifies the index for cross validation.
+
+* weights_column: If you want to provide weights to specific columns you can use this parameter, assigning weight 0 means you are excluding the column.
+
+* ignored_columns: Only in python, it is converse of `x`.
+
+* stopping_metric: Specifies a metric for early stopping of the grid searches and models default value are logloss for classification and deviation for regression.
+
+* sort_metric: The parameter to sort the learderboard models at the end. This defaults to AUC for binary classification, mean_per_class_error for multinomial classification, and deviance for regression.
+
+The validation_frame and leaderboard_frame depends on the cross validation parameter that is `nfolds`.
+
+The following scenarios can generate in two cases:
+
+when we are using cross validation in the automl:
+* Only taining frame is passed - Then data will split into 80-20 of training and validation frame.
+* tarining and leaderboard frame is passed - No change in split again 80-20 split of data in training and validation frame.
+* When training and validation frame is passed - No split.
+* when all three frames are passed - No splits.
+
+When we are not using cross validation which will effect the leaderboard frame a lot(nfolds = 0):
+* Only training frame is passed - The data is split into 80/10/10 training, validation and leaderboard.
+* training and leaderboard frame is passed - Data split into 80-20 of training and validation frames.
+* When training and validation frame is passed - The validation_frame data is split into 50-50 validation and leaderboard.
+* when all three frames are passed - No splits.
 
 
+## Implementation In R and Python
 
-
+### R 
 
 ```{r}
 
-# Import a sample binary outcome train/test set into H2O
-train <- h2o.importFile("higgs_train_10k.csv")
-test <- h2o.importFile("higgs_test_5k.csv")
-
-# Identify predictors and response
-y <- "response"
-x <- setdiff(names(train), y)
-
-# For binary classification, response should be a factor
-train[,y] <- as.factor(train[,y])
-test[,y] <- as.factor(test[,y])
-
-aml <- h2o.automl(x = x, y = y,
-                  training_frame = train,
-                  max_runtime_secs = 300)
-
-# View the AutoML Leaderboard
-lb <- aml@leaderboard
-lb
-
-#                                                model_id       auc   logloss
-# 1    StackedEnsemble_AllModels_0_AutoML_20180503_085035 0.7816995 0.5603380
-# 2 StackedEnsemble_BestOfFamily_0_AutoML_20180503_085035 0.7780683 0.5636519
-# 3             GBM_grid_0_AutoML_20180503_085035_model_1 0.7742967 0.5656552
-# 4             GBM_grid_0_AutoML_20180503_085035_model_0 0.7736082 0.5667454
-# 5             GBM_grid_0_AutoML_20180503_085035_model_2 0.7704520 0.5695492
-# 6             GBM_grid_0_AutoML_20180503_085035_model_3 0.7662087 0.5759679
-#  mean_per_class_error      rmse       mse
-# 1            0.3250067 0.4361930 0.1902644
-# 2            0.3261921 0.4377744 0.1916464
-# 3            0.3233579 0.4390083 0.1927283
-# 4            0.3196441 0.4394696 0.1931335
-# 5            0.3443406 0.4411033 0.1945721
-# 6            0.3348417 0.4439429 0.1970853
-
-# [9 rows x 6 columns]
-
-# The leader model is stored here
-aml@leader
-
-# If you need to generate predictions on a test set, you can make
-# predictions directly on the `"H2OAutoML"` object, or on the leader
-# model object directly
-
-pred <- h2o.predict(aml, test)  # predict(aml, test) also works
-
-# or:
-pred <- h2o.predict(aml@leader, test)
-
 ```
+
+### Python
+
+![Python code](Capture3)
+
+
+
+
 
 
 
