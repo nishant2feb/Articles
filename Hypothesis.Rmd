@@ -1,0 +1,87 @@
+---
+title: "Hypothesis"
+author: "Nishant"
+date: "October 24, 2018"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Hypothesis Testing In Machine learning
+
+The process of hypothesis testing is to draw inferences or some conclusion about the overall population or data by conducting some statistical tests on a sample.
+The same inferences are drawn for different machine learning models through T-test which I will discuss in this tutorial.
+
+For drawing some inferences we have to make some assumptions that leads to two terms that are used in the hypothesis testing.
+
+* Null hypothesis: It is regarding assumption that there is no anomaly pattern or believing according to the assumption made.
+
+* Alternate hypothesis: Contrary to null hypothesis, it shows that observation is the result of real effect.
+
+### P value
+
+It can also be said as evidence or level of significance for the null hypothesis or in machine learning algorithms it's the significance of the predictors towards the target.
+
+Generally we select level of significance by 5 %, but it is also a topic of discussion for some cases. If you have a strong prior knowledge about your data functionality you can decide the level of significance.
+
+On contrary of that if p-value is less than 0.05 in a machine learning model against an independent variable then the variable is considered which means there is heterogeneous behavior with the target which is useful and can be learned by the machine learning algorithms.
+
+The steps involved in the hypothesis testing are as follow:
+
+* Assume a null hypothesis, usually in machine learning algorithms we consider that there is no anomaly between target and independent variable.
+
+* Collect a sample
+
+* Calculate test statistics
+
+* Decide either to accept or reject the null hypothesis
+
+### Calculating test or T statistics
+
+For Calculating T statistics we create a scenario.
+
+Suppose there is shipping container making company which claims that each containers is 1000 kg in weight not less not more. Well such claims looks shady so we proceed with gathering data and creating a sample.
+
+After gathering sample of 30 containers we found that average weight of the container is 990 kg and showing a standard deviation of 12.5 kg.
+
+So calculating test statistics: 
+
+T = (Mean - Claim)/ (Standard deviation / Sample Size^(1/2))
+
+Which is -4.3818 after putting all the numbers.
+
+Now we calculate t value for 0.05 significance and degree of freedom.
+
+Note : `Degree of Freedom = Sample Size - 1`
+
+`From T table the value will be -1.699.`
+
+After comparison we can see that the generated statistics is less than the statistics of desired level of significance. So we can reject claim made.
+
+You can calculate the t value using `stats.t.ppf()` function of `stats` class of `scipy`
+library.
+
+
+### Errors
+
+As hypothesis testing is done on a sample of data rather than entire population due to unavailability of the resources in terms of data. Due to inferences drawn on sample data the hypothesis testing can lead to errors, which can be classified into two parts:
+
+* Type I Error: In this error we reject the null hypothesis when it is true.
+
+* Type II Error: In this error we accept the null hypothesis when it is false.
+
+
+### Other Approaches
+
+A lot of different approaches are present to hypothesis testing of two models like creating two models on the features available with us. One model comprises all the features and other with one less. So we can test the significance of individual features. However feature inter-dependency affect such simple methods.
+
+In regression problems we generally follow the rule of P value, the feature which violates the significance level are removed, thus iteratively improving the model.
+
+Different approaches are present for each algorithm to test the hypothesis on different features.
+
+Learn Bayesian Inferences fundamentsals from [here](https://www.datacamp.com/courses/fundamentals-of-bayesian-data-analysis-in-r).
+
