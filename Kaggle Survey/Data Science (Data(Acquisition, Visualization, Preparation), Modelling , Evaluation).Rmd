@@ -1,0 +1,469 @@
+---
+title: "Data Science (Data(Acquisition, Visualization, Preparation) -> Modelling -> Evaluation)"
+author: "Nishant"
+output:
+  html_document:
+    number_sections: true
+    toc: true
+    fig_width: 10
+    code_folding: hide
+    fig_height: 4.5
+    theme: cosmo
+    highlight: tango
+---
+
+
+# Introduction
+
+Hi, Welcome to my data science's exploration kernel based on the data provided by [Machine Learning and Data Science Survey](https://www.kaggle.com/kaggle/kaggle-survey-2018/home) in which my inputs are also present. 
+It is very exciting to explore about your community and present the insights. I will explore the data in a way that a model being built. The stages involved are 
+
+* Data (Acquisition, Visualization and Preparation)
+* Modelling
+* Evaluation
+
+The data present with us have three file, two will be utilized for extracting data and one for the information of the chracteristics.
+
+- *multiple choice responses* to questions with limited answer options
+- *free-form responses* to open questions
+
+## Derived Summary
+
+Apart from my evaluation scenario here are few summarized facts about the data derived from various kernels about developers.
+
+- **Country of Residence, Gender, Age:** The demographics show that the *US and India had by far the most respondents*, followed by China, Russia, Brazil, and Germany. Africa as well as parts of western Asia and Central America are underrepresented. The survey shows a *predominantly male* community with only about 17% female participation. The age distribution is skewed towards the younger cohorts in their 20s or early 30s. Among the top responding countries, *India has significantly younger participant than the US*.
+
+- **Education & Profession:** Most respondents have a *Bachelor's or Master's degree* from a list of academic fields that is dominated by *Computer Science*, followed by *Engineering* and *Maths & Statistics*. Many of those with a Doctoral degree have a Physics/Astronomy background. The *largest professional cohort are students*, followed by the industry roles of Data Scientist, Software Engineer, and Data Analyst.
+
+- **Experience:** Most respondents have been *in their current role for less than 3 years*, many less than 1 year. Similarly, most people have *coding experience of less than 5 years*, with 1-2 years being the most common answer, and *less than 2 years of ML experience*.
+
+
+# Data(Acquisition, Visualization, Preparation)
+
+## Data Acquisition
+We all know the zero point of any analysis is data or atleast data domain knowledge if you are drawing some bayesian inferences.
+So if we are getting started we should start with data related facts. So I will begin with data acquiring or the sources from data being extracted for the data models.
+
+*Q29 of multiple choice questions posses information regarding relational databases that are used by the developers in last five years.* I will consider the information that the databases are used to acquire data.
+
+Q29 has `1079` responses in which the reponses excluded are; age group 0-17, never written code, not used cloud providers.
+
+
+```{r message=FALSE, warning=FALSE}
+library(plotly)
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(tidyverse)
+
+multipleChoice <- read_csv("multipleChoiceResponses.csv")
+
+DataAquisitionRD <- multipleChoice%>%  
+select(starts_with("Q29")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(20)
+
+DataAquisitionRD%>%
+           ggplot(aes(value, Percentage))+
+           geom_bar(stat = "identity")+
+           labs(x = "Relational Database", y = "Percentage")+
+           coord_flip()+
+           theme_classic()
+
+
+```
+
+Looking at the relation database distribution we can easily see `MySQL`, `PostgresSQL` and `SQLite` are on the top.
+
+*Similarly lets look into bigdata and analytics product.*
+Q30 of multiple choice questions contains the reponse for bigdata and analytics.
+
+```{r}
+
+BigDataAnalytics <- multipleChoice%>%  
+select(starts_with("Q30")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(20)
+
+hchart(BigDataAnalytics, type = "bar", hcaes(x = value, y = Percentage))
+
+
+```
+
+From the view we can see that more than 1/5th developers and modelers are not using any bigdata analytics products, the products that are leading are `Google BigQuery`, `AWS Redshift` and `Databricks`.
+
+*Lets look at the data type used most often.*
+Q31 contains the response.
+
+```{r}
+
+DataType <- multipleChoice%>%  
+select(starts_with("Q31")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(10)
+
+
+
+```
+
+*Lets look at the data type that's being used recently.*
+Q32 contains the reponse.
+
+```{r}
+
+DataTypeRecent <- multipleChoice%>%  
+select(starts_with("Q32")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(10)
+
+
+
+```
+
+*Lets look at public dataset sources.*
+Q33 contains the response for the public datasets.
+
+```{r}
+
+PublicDataset <- multipleChoice%>%  
+select(starts_with("Q33")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(10)
+
+
+```
+
+*Lets look at the time spent in gathering data.*
+
+```{r message=FALSE, warning=FALSE}
+
+GatheringData <- multipleChoice%>%  
+select(Q34_Part_1) %>%
+  mutate(Q34_Part_1 = as.numeric(Q34_Part_1))%>%
+  filter(!is.na(Q34_Part_1))
+
+
+```
+
+
+## Data Visulization
+
+Lets look at the visulaization libraries used in last five years.
+
+```{r}
+
+VizLib <- multipleChoice%>%  
+select(starts_with("Q21")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(10)
+
+
+```
+
+Lets look at the visualization libraries used often in the choices.
+
+```{r}
+
+VizLibOften <- multipleChoice%>%  
+select(starts_with("Q22")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(10)
+
+
+```
+
+*Lets look at the time spent in visualizing data.*
+
+```{r}
+
+VisulazingTime <- multipleChoice%>%  
+select(Q34_Part_3) %>%
+  mutate(Q34_Part_3 = as.numeric(Q34_Part_3))%>%
+  filter(!is.na(Q34_Part_3))
+
+
+
+```
+
+
+## Data Preparation
+
+*Lets look at the primary tool used to analyse data.*
+
+```{r}
+
+ToolAnalyse <- multipleChoice%>%  
+select(starts_with("Q12")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  filter(value != 1)%>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(6)
+
+
+```
+
+
+*Lets look at the hosted notebooks used in last 5 years.*
+
+```{r}
+
+HostedNotebooks <- multipleChoice%>%  
+select(starts_with("Q14")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  filter(value != 1)%>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(11)
+
+
+
+```
+
+*Lets look at the data cleaning part.*
+
+```{r message=FALSE, warning=FALSE}
+
+CleaningData <- multipleChoice%>%  
+select(Q34_Part_2) %>%
+  mutate(Q34_Part_2 = as.numeric(Q34_Part_2))%>%
+  filter(!is.na(Q34_Part_2))
+
+
+
+```
+
+
+# Modelling
+
+In previous section I tried to capture the processes related to data that are `acquisition`, `visualization` and `preparation`. Now we look at the section of modelling.
+
+Q19 possess the response for the machine learning framework, so lets look by visualizing it.
+
+```{r}
+
+MLFramework <- multipleChoice%>%  
+select(starts_with("Q19")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(19)
+
+
+
+```
+
+
+Q28 possess the response for machine learning products that are used in last five years.
+
+```{r}
+
+MLproducts <- multipleChoice%>%  
+select(starts_with("Q28")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1) %>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(25)
+
+
+
+```
+
+
+Q34 contains the reponse for thetime spent in building Models.
+
+```{r message=FALSE, warning=FALSE}
+
+
+CleaningData <- multipleChoice%>%  
+select(Q34_Part_4) %>%
+  mutate(Q34_Part_4 = as.numeric(Q34_Part_4))%>%
+  filter(!is.na(Q34_Part_4))
+
+
+```
+
+
+Q43 possess responses for the time spent for exploring unfair bias dataset.
+
+```{r}
+
+BiasData <- multipleChoice%>%  
+select(Q43) %>%
+  filter(!is.na("Q43"))%>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1)%>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(10)
+
+
+
+```
+
+Q44 Possess response for the difficulties faced in exploring the biased data.
+
+```{r}
+
+BiasDataDifficulty <- multipleChoice%>%  
+select(starts_with("Q44")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1)%>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(6)
+
+
+
+```
+
+
+
+
+# Evaluation 
+
+Now we look at the last phase that is evaluation, Lets look at the evaluating factors.
+
+Q42 possess the response for the factors that are considered for the sucess or failure of a model in different organization.
+
+
+```{r}
+
+
+OrganisationalFactors <- multipleChoice%>%  
+select(starts_with("Q42")) %>%
+  gather() %>%
+  filter(!is.na(value)) %>%
+  filter(value != -1)%>%
+  select(value)%>%
+  group_by(value)%>%
+  summarise(Count = n()) %>%
+  mutate(TotalCount = nrow(multipleChoice)) %>%
+  mutate(Percentage = (Count/TotalCount) * 100) %>%
+  arrange(desc(Count)) %>%
+  ungroup() %>%
+  mutate(value = reorder(value,Count))%>%
+  head(5)
+
+
+```
+
+
+More updates to come in correlating and summarizing the procedures....
+
