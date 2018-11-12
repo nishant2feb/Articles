@@ -16,7 +16,7 @@ output:
 # Introduction
 
 Hi, Welcome to my data science's exploration kernel based on the data provided by [Machine Learning and Data Science Survey](https://www.kaggle.com/kaggle/kaggle-survey-2018/home) in which my inputs are also present. 
-It is very exciting to explore about your community and present the insights. I will explore the data in a way that a model being built. The stages involved are 
+It is very exciting to explore about your community and present the insights. I will explore the data in a way that a model being built in different organizations. The stages involved are 
 
 * Data (Acquisition, Visualization and Preparation)
 * Modelling
@@ -29,7 +29,7 @@ The data present with us have three file, two will be utilized for extracting da
 
 ## Derived Summary
 
-Apart from my evaluation scenario here are few summarized facts about the data derived from various kernels about developers.
+Apart from my evaluation scenario here are few summarized facts about the developers derived from various kernels which I am not covering in this kernel.
 
 - **Country of Residence, Gender, Age:** The demographics show that the *US and India had by far the most respondents*, followed by China, Russia, Brazil, and Germany. Africa as well as parts of western Asia and Central America are underrepresented. The survey shows a *predominantly male* community with only about 17% female participation. The age distribution is skewed towards the younger cohorts in their 20s or early 30s. Among the top responding countries, *India has significantly younger participant than the US*.
 
@@ -57,28 +57,28 @@ library(broom)
 library(tidyverse)
 
 multipleChoice <- read_csv("multipleChoiceResponses.csv")
+Col_palete = colorRampPalette(c("blue", "green", "orange", "red"))(100)
 
 DataAquisitionRD <- multipleChoice%>%  
-select(starts_with("Q29")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7,starts_with("Q29"), -Q29_OTHER_TEXT) %>%
+  gather(key =  RD_Attr, value = RD, -Q7) %>%
+  filter(!is.na(RD)) %>%
+  filter(RD!="None")%>%
+  select(Q7,RD)%>%
+  group_by(Q7, RD)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(20)
+  ungroup()%>%
+  filter(Count != 1)
 
 DataAquisitionRD%>%
-           ggplot(aes(value, Percentage))+
-           geom_bar(stat = "identity")+
-           labs(x = "Relational Database", y = "Percentage")+
-           coord_flip()+
-           theme_classic()
+  ggplot(aes(x = Q7, y = RD))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 
 ```
@@ -91,22 +91,24 @@ Q30 of multiple choice questions contains the reponse for bigdata and analytics.
 ```{r}
 
 BigDataAnalytics <- multipleChoice%>%  
-select(starts_with("Q30")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7, starts_with("Q30"), -Q30_OTHER_TEXT) %>%
+  gather(key =  BD_Attr, value = BD, -Q7) %>%
+  filter(!is.na(BD)) %>%
+  filter(BD!="None")%>%
+  select(Q7,BD)%>%
+  group_by(Q7, BD)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(20)
+  ungroup()%>%
+  filter(Count != 1)
 
-hchart(BigDataAnalytics, type = "bar", hcaes(x = value, y = Percentage))
-
+BigDataAnalytics%>%
+  ggplot(aes(x = Q7, y = BD))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
@@ -117,22 +119,25 @@ Q31 contains the response.
 
 ```{r}
 
-DataType <- multipleChoice%>%  
-select(starts_with("Q31")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+DataType <-multipleChoice%>%  
+select(Q7, starts_with("Q31"), -Q31_OTHER_TEXT) %>%
+  gather(key =  DT_Attr, value = DT, -Q7) %>%
+  filter(!is.na(DT)) %>%
+  filter(DT!="None")%>%
+  select(Q7,DT)%>%
+  group_by(Q7, DT)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(10)
+  ungroup()%>%
+  filter(Count != 1)
 
-
+DataType%>%
+  ggplot(aes(x = Q7, y = DT))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
@@ -142,20 +147,24 @@ Q32 contains the reponse.
 ```{r}
 
 DataTypeRecent <- multipleChoice%>%  
-select(starts_with("Q32")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7, starts_with("Q32"), -Q32_OTHER) %>%
+  gather(key =  DTR_Attr, value = DTR, -Q7) %>%
+  filter(!is.na(DTR)) %>%
+  filter(DTR!="None")%>%
+  select(Q7,DTR)%>%
+  group_by(Q7, DTR)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(10)
+  ungroup()%>%
+  filter(Count != 1)
 
+DataTypeRecent%>%
+  ggplot(aes(x = Q7, y = DTR))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 ```
@@ -166,20 +175,24 @@ Q33 contains the response for the public datasets.
 ```{r}
 
 PublicDataset <- multipleChoice%>%  
-select(starts_with("Q33")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7, starts_with("Q33"), -Q33_OTHER_TEXT) %>%
+  gather(key =  PD_Attr, value = PD, -Q7) %>%
+  filter(!is.na(PD)) %>%
+  filter(PD!="None")%>%
+  select(Q7,PD)%>%
+  group_by(Q7, PD)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(10)
+  ungroup()%>%
+  filter(Count != 1)
 
+PublicDataset%>%
+  ggplot(aes(x = Q7, y = PD))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
@@ -188,35 +201,53 @@ select(starts_with("Q33")) %>%
 ```{r message=FALSE, warning=FALSE}
 
 GatheringData <- multipleChoice%>%  
-select(Q34_Part_1) %>%
+select(Q7, Q34_Part_1) %>%
+  filter(!is.na(Q34_Part_1)) %>%
+  filter(!is.na(Q7))%>%
   mutate(Q34_Part_1 = as.numeric(Q34_Part_1))%>%
-  filter(!is.na(Q34_Part_1))
+  group_by(Q7, Q34_Part_1)%>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  ungroup()%>%
+  filter(Count != 1)
+
+GatheringData%>%
+  ggplot(aes(x = Q7, y = as.factor(Q34_Part_1)))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 ```
 
 
-## Data Visulization
+## Data Visualization
 
 Lets look at the visulaization libraries used in last five years.
 
 ```{r}
 
 VizLib <- multipleChoice%>%  
-select(starts_with("Q21")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7, starts_with("Q21"), -Q21_OTHER_TEXT) %>%
+  gather(key =  VL_Attr, value = VL, -Q7) %>%
+  filter(!is.na(VL)) %>%
+  filter(VL!="None")%>%
+  select(Q7,VL)%>%
+  group_by(Q7, VL)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(10)
+  ungroup()%>%
+  filter(Count != 1)
 
+VizLib%>%
+  ggplot(aes(x = Q7, y = VL))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
@@ -225,19 +256,25 @@ Lets look at the visualization libraries used often in the choices.
 ```{r}
 
 VizLibOften <- multipleChoice%>%  
-select(starts_with("Q22")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7, starts_with("Q22"), -Q22_OTHER_TEXT) %>%
+  gather(key =  VLO_Attr, value = VLO, -Q7) %>%
+  filter(!is.na(VLO)) %>%
+  filter(VLO!="None")%>%
+  select(Q7,VLO)%>%
+  group_by(Q7, VLO)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(10)
+  ungroup()%>%
+  filter(Count != 1)
+
+VizLibOften%>%
+  ggplot(aes(x = Q7, y = VLO))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 
 ```
