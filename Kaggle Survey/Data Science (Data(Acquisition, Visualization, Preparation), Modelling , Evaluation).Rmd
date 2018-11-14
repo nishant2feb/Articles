@@ -77,7 +77,8 @@ DataAquisitionRD%>%
   geom_text(aes(label = Count))+
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Relational Databases")
 
 
 
@@ -88,7 +89,7 @@ Looking at the relation database distribution we can easily see `MySQL`, `Postgr
 *Similarly lets look into bigdata and analytics product.*
 Q30 of multiple choice questions contains the reponse for bigdata and analytics.
 
-```{r}
+```{r fig.height= 5}
 
 BigDataAnalytics <- multipleChoice%>%  
 select(Q7, starts_with("Q30"), -Q30_OTHER_TEXT) %>%
@@ -108,7 +109,8 @@ BigDataAnalytics%>%
   geom_text(aes(label = Count))+
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Big Data Analytics Platforms")
 
 ```
 
@@ -137,7 +139,8 @@ DataType%>%
   geom_text(aes(label = Count))+
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Data Type")
 
 ```
 
@@ -164,7 +167,8 @@ DataTypeRecent%>%
   geom_text(aes(label = Count))+
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Data Type recent")
 
 
 ```
@@ -192,13 +196,15 @@ PublicDataset%>%
   geom_text(aes(label = Count))+
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Public Datasets")+
+  scale_y_discrete(label = function(y) abbreviate(y, minlength = 30))
 
 ```
 
 *Lets look at the time spent in gathering data.*
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, fig.height=8}
 
 GatheringData <- multipleChoice%>%  
 select(Q7, Q34_Part_1) %>%
@@ -217,7 +223,8 @@ GatheringData%>%
   geom_text(aes(label = Count))+
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "% of time spent")
 
 
 ```
@@ -247,7 +254,8 @@ VizLib%>%
   geom_text(aes(label = Count))+
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Visualization libraries")
 
 ```
 
@@ -273,7 +281,8 @@ VizLibOften%>%
   geom_text(aes(label = Count))+
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Often Used VL")
 
 
 
@@ -281,12 +290,27 @@ VizLibOften%>%
 
 *Lets look at the time spent in visualizing data.*
 
-```{r}
+```{r, fig.height=8}
 
-VisulazingTime <- multipleChoice%>%  
-select(Q34_Part_3) %>%
+VisualizingTime <- multipleChoice%>%  
+select(Q7, Q34_Part_3) %>%
+  filter(!is.na(Q34_Part_3)) %>%
+  filter(!is.na(Q7))%>%
   mutate(Q34_Part_3 = as.numeric(Q34_Part_3))%>%
-  filter(!is.na(Q34_Part_3))
+  group_by(Q7, Q34_Part_3)%>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  ungroup()%>%
+  filter(Count != 1)
+
+VisualizingTime%>%
+  ggplot(aes(x = Q7, y = as.factor(Q34_Part_3)))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "% of Time Spent")
 
 
 
@@ -300,20 +324,24 @@ select(Q34_Part_3) %>%
 ```{r}
 
 ToolAnalyse <- multipleChoice%>%  
-select(starts_with("Q12")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  filter(value != 1)%>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7, Q12_MULTIPLE_CHOICE) %>%
+  filter(!is.na(Q12_MULTIPLE_CHOICE)) %>%
+  filter(!is.na(Q7))%>%
+  group_by(Q7, Q12_MULTIPLE_CHOICE)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(6)
+  ungroup()
+
+ToolAnalyse%>%
+  ggplot(aes(x = Q7, y = Q12_MULTIPLE_CHOICE))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_discrete(label = function(x) abbreviate(x, minlength = 20))+
+  scale_y_discrete(label = function(y) abbreviate(y, minlength = 20))+
+  labs(x = "Oraginizations", y = "Tools for Analysis")
 
 
 ```
@@ -324,20 +352,25 @@ select(starts_with("Q12")) %>%
 ```{r}
 
 HostedNotebooks <- multipleChoice%>%  
-select(starts_with("Q14")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  filter(value != 1)%>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7,starts_with("Q14"), -Q14_OTHER_TEXT) %>%
+  gather(key =  HN_Attr, value = HN, -Q7) %>%
+  filter(!is.na(HN)) %>%
+  filter(HN!="None")%>%
+  select(Q7,HN)%>%
+  group_by(Q7, HN)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(11)
+  ungroup()%>%
+  filter(Count != 1)
+
+HostedNotebooks%>%
+  ggplot(aes(x = Q7, y = HN))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Notebooks")
 
 
 
@@ -345,12 +378,27 @@ select(starts_with("Q14")) %>%
 
 *Lets look at the data cleaning part.*
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, fig.height=8}
 
 CleaningData <- multipleChoice%>%  
-select(Q34_Part_2) %>%
+select(Q7, Q34_Part_2) %>%
+  filter(!is.na(Q34_Part_2)) %>%
+  filter(!is.na(Q7))%>%
   mutate(Q34_Part_2 = as.numeric(Q34_Part_2))%>%
-  filter(!is.na(Q34_Part_2))
+  group_by(Q7, Q34_Part_2)%>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  ungroup()%>%
+  filter(Count != 1)
+
+CleaningData%>%
+  ggplot(aes(x = Q7, y = as.factor(Q34_Part_2)))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "% of Time Spent")
 
 
 
@@ -366,19 +414,25 @@ Q19 possess the response for the machine learning framework, so lets look by vis
 ```{r}
 
 MLFramework <- multipleChoice%>%  
-select(starts_with("Q19")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7,starts_with("Q19"), -Q19_OTHER_TEXT) %>%
+  gather(key =  MLF_Attr, value = MLF, -Q7) %>%
+  filter(!is.na(MLF)) %>%
+  filter(MLF!="None")%>%
+  select(Q7,MLF)%>%
+  group_by(Q7, MLF)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(19)
+  ungroup()%>%
+  filter(Count != 1)
+
+MLFramework%>%
+  ggplot(aes(x = Q7, y = MLF))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Machine Learning Framework")
 
 
 
@@ -387,23 +441,28 @@ select(starts_with("Q19")) %>%
 
 Q28 possess the response for machine learning products that are used in last five years.
 
-```{r}
+```{r fig.height= 10}
 
 MLproducts <- multipleChoice%>%  
-select(starts_with("Q28")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1) %>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7,starts_with("Q28"), -Q28_OTHER_TEXT) %>%
+  gather(key =  MLP_Attr, value = MLP, -Q7) %>%
+  filter(!is.na(MLP)) %>%
+  filter(MLP!="None")%>%
+  select(Q7,MLP)%>%
+  group_by(Q7, MLP)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(25)
+  ungroup()%>%
+  filter(Count != 1)
 
+MLproducts%>%
+  ggplot(aes(x = Q7, y = MLP))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "Big Data Analytics Platforms")
 
 
 ```
@@ -415,10 +474,24 @@ Q34 contains the reponse for thetime spent in building Models.
 
 
 CleaningData <- multipleChoice%>%  
-select(Q34_Part_4) %>%
+select(Q7, Q34_Part_4) %>%
+  filter(!is.na(Q34_Part_4)) %>%
+  filter(!is.na(Q7))%>%
   mutate(Q34_Part_4 = as.numeric(Q34_Part_4))%>%
-  filter(!is.na(Q34_Part_4))
+  group_by(Q7, Q34_Part_4)%>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  ungroup()%>%
+  filter(Count != 1)
 
+CleaningData%>%
+  ggplot(aes(x = Q7, y = as.factor(Q34_Part_4)))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "% time spent")
 
 ```
 
@@ -428,20 +501,24 @@ Q43 possess responses for the time spent for exploring unfair bias dataset.
 ```{r}
 
 BiasData <- multipleChoice%>%  
-select(Q43) %>%
-  filter(!is.na("Q43"))%>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1)%>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7, Q43) %>%
+  filter(!is.na(Q43)) %>%
+  filter(!is.na(Q7))%>%
+  group_by(Q7, Q43)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(10)
+  ungroup()%>%
+  filter(Count != 1)
+
+BiasData%>%
+  ggplot(aes(x = Q7, y = as.factor(Q43)))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Oraginizations", y = "% time spent")
+
 
 
 
@@ -452,20 +529,26 @@ Q44 Possess response for the difficulties faced in exploring the biased data.
 ```{r}
 
 BiasDataDifficulty <- multipleChoice%>%  
-select(starts_with("Q44")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1)%>%
-  select(value)%>%
-  group_by(value)%>%
+select(Q7,starts_with("Q44")) %>%
+  gather(key =  BDD_Attr, value = BDD, -Q7) %>%
+  filter(!is.na(BDD)) %>%
+  filter(BDD!="None")%>%
+  select(Q7,BDD)%>%
+  group_by(Q7, BDD)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(6)
+  ungroup()%>%
+  filter(Count != 1)
 
+BiasDataDifficulty%>%
+  ggplot(aes(x = Q7, y = BDD))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_discrete(label = function(y) abbreviate(y, minlength = 20))+
+  labs(x = "Oraginizations", y = "Difficulties in exploring bias  data")
 
 
 ```
@@ -483,20 +566,27 @@ Q42 possess the response for the factors that are considered for the sucess or f
 ```{r}
 
 
-OrganisationalFactors <- multipleChoice%>%  
-select(starts_with("Q42")) %>%
-  gather() %>%
-  filter(!is.na(value)) %>%
-  filter(value != -1)%>%
-  select(value)%>%
-  group_by(value)%>%
+EvaluationFactors <- multipleChoice%>%  
+select(Q7,starts_with("Q42"), -Q42_OTHER_TEXT) %>%
+  gather(key =  EF_Attr, value = EF, -Q7) %>%
+  filter(!is.na(EF)) %>%
+  filter(EF!="None")%>%
+  select(Q7,EF)%>%
+  group_by(Q7, EF)%>%
   summarise(Count = n()) %>%
-  mutate(TotalCount = nrow(multipleChoice)) %>%
-  mutate(Percentage = (Count/TotalCount) * 100) %>%
   arrange(desc(Count)) %>%
-  ungroup() %>%
-  mutate(value = reorder(value,Count))%>%
-  head(5)
+  ungroup()%>%
+  filter(Count != 1)
+
+EvaluationFactors%>%
+  ggplot(aes(x = Q7, y = EF))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_discrete(label = function(y) abbreviate(y, minlength = 30))+
+  labs(x = "Oraginizations", y = "Evaluation Factors")
 
 
 ```
