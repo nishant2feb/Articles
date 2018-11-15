@@ -591,6 +591,39 @@ EvaluationFactors%>%
 
 ```
 
+Now lets look at the methods used for explaining or interpreting the ML models.
+
+Q47 possess the responses about the method.
+
+```{r, fig.height=8}
+
+EvaluationFactors <- multipleChoice%>%  
+select(Q7,starts_with("Q47")) %>%
+  gather(key =  ME_Attr, value = ME, -Q7) %>%
+  filter(!is.na(ME)) %>%
+  filter(ME!="None")%>%
+  select(Q7,ME)%>%
+  group_by(Q7, ME)%>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  ungroup()%>%
+  filter(Count != 1)
+
+EvaluationFactors%>%
+  ggplot(aes(x = Q7, y = ME))+
+  geom_tile(aes(fill = Count))+
+  geom_text(aes(label = Count))+
+  scale_fill_gradientn(colours = Col_palete)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_discrete(label = function(y) abbreviate(y, minlength = 30))+
+  labs(x = "Oraginizations", y = "Methods for interpreting the model")
+
+```
+
+
+
+
 
 More updates to come in correlating and summarizing the procedures....
 
