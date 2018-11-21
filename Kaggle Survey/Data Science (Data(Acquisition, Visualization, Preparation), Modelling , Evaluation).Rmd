@@ -40,10 +40,11 @@ Apart from my evaluation scenario here are few summarized facts about the develo
 
 # Data(Acquisition, Visualization, Preparation)
 
-## Data Acquisition
+## Data Acquisition {.tabset .tabset-fade .tabset-pills}
 We all know the zero point of any analysis is data or atleast data domain knowledge if you are drawing some bayesian inferences.
 So if we are getting started we should start with data related facts. So I will begin with data acquiring or the sources from data being extracted for the data models.
 
+### Relational Databases
 *Q29 of multiple choice questions posses information regarding relational databases that are used by the developers in last five years.* I will consider the information that the databases are used to acquire data.
 
 Q29 has `1079` responses in which the reponses excluded are; age group 0-17, never written code, not used cloud providers.
@@ -86,6 +87,8 @@ DataAquisitionRD%>%
 
 Looking at the relation database distribution we can easily see `MySQL`, `PostgresSQL` and `SQLite` are on the top.
 
+### Big Data Analytics Platforms
+
 *Similarly lets look into bigdata and analytics product.*
 Q30 of multiple choice questions contains the reponse for bigdata and analytics.
 
@@ -116,6 +119,7 @@ BigDataAnalytics%>%
 
 From the view we can see that more than 1/5th developers and modelers are not using any bigdata analytics products, the products that are leading are `Google BigQuery`, `AWS Redshift` and `Databricks`.
 
+### Data Type
 *Lets look at the data type used most often.*
 Q31 contains the response.
 
@@ -143,6 +147,8 @@ DataType%>%
   labs(x = "Oraginizations", y = "Data Type")
 
 ```
+
+### Data Type recent
 
 *Lets look at the data type that's being used recently.*
 Q32 contains the reponse.
@@ -173,6 +179,8 @@ DataTypeRecent%>%
 
 ```
 
+### Public Datasets
+
 *Lets look at public dataset sources.*
 Q33 contains the response for the public datasets.
 
@@ -202,6 +210,8 @@ PublicDataset%>%
 
 ```
 
+### Percent of time spent in data gathering
+
 *Lets look at the time spent in gathering data.*
 
 ```{r message=FALSE, warning=FALSE, fig.height=8}
@@ -230,7 +240,9 @@ GatheringData%>%
 ```
 
 
-## Data Visualization
+## Data Visualization {.tabset .tabset-fade .tabset-pills}
+
+### Visualization libraries
 
 Lets look at the visulaization libraries used in last five years.
 
@@ -258,6 +270,8 @@ VizLib%>%
   labs(x = "Oraginizations", y = "Visualization libraries")
 
 ```
+
+### Often Used VL
 
 Lets look at the visualization libraries used often in the choices.
 
@@ -288,6 +302,8 @@ VizLibOften%>%
 
 ```
 
+### % of Time Spent in data visualization
+
 *Lets look at the time spent in visualizing data.*
 
 ```{r, fig.height=8}
@@ -317,8 +333,9 @@ VisualizingTime%>%
 ```
 
 
-## Data Preparation
+## Data Preparation {.tabset .tabset-fade .tabset-pills}
 
+### Tools for Analysis
 *Lets look at the primary tool used to analyse data.*
 
 ```{r}
@@ -346,6 +363,7 @@ ToolAnalyse%>%
 
 ```
 
+### Notebooks
 
 *Lets look at the hosted notebooks used in last 5 years.*
 
@@ -376,6 +394,8 @@ HostedNotebooks%>%
 
 ```
 
+### % of Time Spent in data cleaning
+
 *Lets look at the data cleaning part.*
 
 ```{r message=FALSE, warning=FALSE, fig.height=8}
@@ -405,9 +425,11 @@ CleaningData%>%
 ```
 
 
-# Modelling
+# Modelling {.tabset .tabset-fade .tabset-pills}
 
 In previous section I tried to capture the processes related to data that are `acquisition`, `visualization` and `preparation`. Now we look at the section of modelling.
+
+## Machine Learning Framework
 
 Q19 possess the response for the machine learning framework, so lets look by visualizing it.
 
@@ -438,6 +460,7 @@ MLFramework%>%
 
 ```
 
+## Machine learning products
 
 Q28 possess the response for machine learning products that are used in last five years.
 
@@ -462,13 +485,14 @@ MLproducts%>%
   scale_fill_gradientn(colours = Col_palete)+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  labs(x = "Oraginizations", y = "Big Data Analytics Platforms")
+  labs(x = "Oraginizations", y = "Machine learning products")
 
 
 ```
 
+## % time spent in buidling models
 
-Q34 contains the reponse for thetime spent in building Models.
+Q34 contains the reponse for the time spent in building Models.
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -495,6 +519,7 @@ CleaningData%>%
 
 ```
 
+## % time spent in exploring unbiased data
 
 Q43 possess responses for the time spent for exploring unfair bias dataset.
 
@@ -524,6 +549,8 @@ BiasData%>%
 
 ```
 
+## Difficulties in exploring bias data
+
 Q44 Possess response for the difficulties faced in exploring the biased data.
 
 ```{r}
@@ -548,7 +575,7 @@ BiasDataDifficulty%>%
   theme_bw()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_y_discrete(label = function(y) abbreviate(y, minlength = 20))+
-  labs(x = "Oraginizations", y = "Difficulties in exploring bias  data")
+  labs(x = "Oraginizations", y = "Difficulties in exploring bias data")
 
 
 ```
@@ -556,9 +583,11 @@ BiasDataDifficulty%>%
 
 
 
-# Evaluation 
+# Evaluation {.tabset .tabset-fade .tabset-pills}
 
 Now we look at the last phase that is evaluation, Lets look at the evaluating factors.
+
+## Evaluation Factors
 
 Q42 possess the response for the factors that are considered for the sucess or failure of a model in different organization.
 
@@ -590,6 +619,8 @@ EvaluationFactors%>%
 
 
 ```
+
+## Methods for interpreting the model
 
 Now lets look at the methods used for explaining or interpreting the ML models.
 
